@@ -1,8 +1,7 @@
 package com.spring.netty.common.proxy;
 
-import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.remote.NettyRequest;
-import com.spring.netty.common.util.ChannelManger;
+import com.spring.netty.common.util.ClientManger;
 import com.spring.netty.common.util.Idutil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +49,7 @@ public class ObjectProxy<T> implements InvocationHandler {
         request.setArgs(args);
         request.setInterfaceName(clazz.getName());
         log.info("request : {}", request);
-        ChannelManger.getChannel().writeAndFlush(JSONObject.toJSONString(request));
+        ClientManger.getClient().request(request);
         return null;
     }
 }
