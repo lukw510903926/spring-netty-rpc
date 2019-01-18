@@ -11,6 +11,7 @@
         <module>spring-netty-rpc-api</module>
         <module>spring-netty-rpc-server</module>
         <module>spring-netty-rpc-client</module>
+        <module>spring-netty-rpc-common</module>
     </modules>
     <packaging>pom</packaging>
     <name>spring-netty-rpc</name>
@@ -68,6 +69,11 @@
             <dependency>
                 <groupId>com.spring.netty</groupId>
                 <artifactId>spring-netty-rpc-api</artifactId>
+                <version>${netty.rpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.spring.netty</groupId>
+                <artifactId>spring-netty-rpc-common</artifactId>
                 <version>${netty.rpc.version}</version>
             </dependency>
             <dependency>

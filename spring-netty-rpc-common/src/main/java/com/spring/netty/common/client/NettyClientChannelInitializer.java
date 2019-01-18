@@ -1,12 +1,12 @@
-package com.spring.netty.client.netty;
-
-import java.nio.charset.Charset;
+package com.spring.netty.common.client;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
+
+import java.nio.charset.Charset;
 
 public class NettyClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 	// 绑定连接初始化器

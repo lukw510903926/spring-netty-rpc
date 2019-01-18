@@ -1,7 +1,9 @@
 package com.spring.netty.server.service;
 
 import com.spring.netty.api.PersonService;
+import com.spring.netty.common.annotation.Provider;
 import com.spring.netty.entity.Person;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * @email yangqi@ywwl.com
  * @since 2019/1/17 17:12
  **/
+@Service
+@Provider
 public class PersonServiceImpl implements PersonService {
 
     @Override

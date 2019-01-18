@@ -1,9 +1,8 @@
-package com.spring.netty.server.netty;
+package com.spring.netty.common.server;
 
 import com.alibaba.fastjson.JSONObject;
-import com.spring.netty.remote.NettyRequest;
-import com.spring.netty.remote.NettyResponse;
-import com.spring.netty.server.service.PersonServiceImpl;
+import com.spring.netty.common.remote.NettyRequest;
+import com.spring.netty.common.remote.NettyResponse;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -11,19 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
-    private static Map<String, Object> instanceMap = new ConcurrentHashMap<String, Object>() {
+    private Map<String, Object> instanceMap;
 
-        private static final long serialVersionUID = -456961058980683309L;
-
-        {
-            put("com.spring.netty.api.PersonService", new PersonServiceImpl());
-        }
-    };
+    NettyServerHandler(Map<String, Object> instanceMap){
+        this.instanceMap = instanceMap;
+    }
 
     /*
      * channelAction

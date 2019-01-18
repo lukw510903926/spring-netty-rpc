@@ -1,19 +1,20 @@
-package com.spring.netty.client.netty;
-
-import java.net.InetSocketAddress;
+package com.spring.netty.common.client;
 
 import com.alibaba.fastjson.JSONObject;
-import com.spring.netty.remote.NettyRequest;
+import com.spring.netty.common.remote.NettyRequest;
+import com.spring.netty.common.util.ChannelManger;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
 
-@Component
+import java.net.InetSocketAddress;
+
+@Slf4j
 public class NettyClient implements InitializingBean {
 
     private String host = "127.0.0.1";
@@ -53,8 +54,15 @@ public class NettyClient implements InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        NettyClient client = new NettyClient("127.0.0.1", 8888);
-        channel = client.start();
+    public void afterPropertiesSet() {
+
+        try {
+            NettyClient client = new NettyClient("127.0.0.1", 8888);
+            channel = client.start();
+            ChannelManger.addChannel(channel);
+        } catch (Exception e) {
+            System.exit(-1);
+            log.error("netty 启动失败 : {}", e);
+        }
     }
 }

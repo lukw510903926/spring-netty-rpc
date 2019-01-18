@@ -1,10 +1,11 @@
-package com.spring.netty.client.netty;
+package com.spring.netty.common.client;
 
-import java.nio.charset.Charset;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.Charset;
 
 @Slf4j
 public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {

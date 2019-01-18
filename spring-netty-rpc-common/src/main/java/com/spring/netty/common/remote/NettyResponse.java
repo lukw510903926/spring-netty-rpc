@@ -1,4 +1,4 @@
-package com.spring.netty.remote;
+package com.spring.netty.common.remote;
 
 import lombok.Data;
 
