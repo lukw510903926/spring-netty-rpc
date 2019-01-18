@@ -1,6 +1,7 @@
 package com.spring.netty.common.server;
 
 import com.alibaba.fastjson.JSONObject;
+import com.spring.netty.common.exception.RpcException;
 import com.spring.netty.common.remote.NettyRequest;
 import com.spring.netty.common.remote.NettyResponse;
 import io.netty.buffer.Unpooled;
@@ -16,7 +17,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private Map<String, Object> instanceMap;
 
-    NettyServerHandler(Map<String, Object> instanceMap){
+    NettyServerHandler(Map<String, Object> instanceMap) {
         this.instanceMap = instanceMap;
     }
 
@@ -48,16 +49,27 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * 功能：读取服务器发送过来的信息
      */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         // 第一种：接收字符串时的处理
-        log.info("服务端收到数据 : {}",  msg);
+        log.info("服务端收到数据 : {}", msg);
         NettyRequest nettyRequest = JSONObject.parseObject(msg.toString(), NettyRequest.class);
         Object instance = instanceMap.get(nettyRequest.getInterfaceName());
-        Method method = instance.getClass().getMethod(nettyRequest.getMethodName(), nettyRequest.getParameterTypes());
-        Object result = method.invoke(instance, nettyRequest.getArgs());
         NettyResponse response = new NettyResponse();
-        response.setData(result);
         response.setResponseId(nettyRequest.getRequestId());
+        if (instance == null) {
+            response.setException(new RpcException("provider 不存在"));
+            ctx.writeAndFlush(JSONObject.toJSONString(response));
+        } else {
+            try {
+                Method method = instance.getClass().getMethod(nettyRequest.getMethodName(), nettyRequest.getParameterTypes());
+                Object result = method.invoke(instance, nettyRequest.getArgs());
+                response.setData(result);
+            } catch (NoSuchMethodException | SecurityException e) {
+                response.setException(new RpcException(nettyRequest.getMethodName() + " 方法不存在"));
+            } catch (Exception e) {
+                response.setException(new RpcException(nettyRequest.getMethodName() + "方法调用失败"));
+            }
+        }
         ctx.writeAndFlush(JSONObject.toJSONString(response));
     }
 
@@ -80,7 +92,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * 功能：服务端发生异常的操作
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause){
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("server has error : {}", cause);
         ctx.close();
     }

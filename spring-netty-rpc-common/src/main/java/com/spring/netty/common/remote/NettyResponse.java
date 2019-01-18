@@ -1,7 +1,6 @@
 package com.spring.netty.common.remote;
 
 import lombok.Data;
-
 import java.io.Serializable;
 
 /**
@@ -24,4 +23,9 @@ public class NettyResponse<T> implements Serializable {
     private Boolean success;
 
     private Exception exception;
+
+    public void setException(Exception exception) {
+        this.exception = exception;
+        this.setSuccess(false);
+    }
 }

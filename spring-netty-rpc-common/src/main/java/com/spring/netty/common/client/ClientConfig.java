@@ -3,11 +3,10 @@ package com.spring.netty.common.client;
 import com.spring.netty.common.annotation.Client;
 import com.spring.netty.common.proxy.ProxyUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -29,12 +28,12 @@ public class ClientConfig implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 
-        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(Client.class);
-        if (MapUtils.isNotEmpty(beans)) {
-
-            beans.values().forEach(bean -> {
-                Field[] fields = bean.getClass().getDeclaredFields();
-                if (fields != null && fields.length > 0) {
+        String[] names = applicationContext.getBeanDefinitionNames();
+        if(ArrayUtils.isNotEmpty(names)){
+           Arrays.asList(names).forEach(name -> {
+               Object bean = applicationContext.getBean(name);
+               Field[] fields = bean.getClass().getDeclaredFields();
+                if (ArrayUtils.isNotEmpty(fields)) {
                     try {
                         for (Field field : Arrays.asList(fields)) {
                             if (field.isAnnotationPresent(Client.class)) {

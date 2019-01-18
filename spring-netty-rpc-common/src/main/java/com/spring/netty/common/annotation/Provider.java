@@ -16,4 +16,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Provider {
+
+    Class<?>[] value() default void.class;
 }
