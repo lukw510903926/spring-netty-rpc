@@ -34,12 +34,7 @@ public class NettyServer implements InitializingBean, ApplicationContextAware {
     @Override
     public void afterPropertiesSet() {
 
-        try {
-            startNettyServer();
-        } catch (InterruptedException e) {
-            System.exit(-1);
-            log.error("netty 容器启动失败 : {}", e);
-        }
+        startNettyServer();
     }
 
     @Override
@@ -59,19 +54,24 @@ public class NettyServer implements InitializingBean, ApplicationContextAware {
         }
     }
 
-    private void startNettyServer() throws InterruptedException {
+    private void startNettyServer() {
 
-        log.info("启动netty容器");
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new NettyServerChannelInitializer(providerMap))
-                .option(ChannelOption.SO_BACKLOG, 128)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
-        int port = 8888;
-        bootstrap.bind("127.0.0.1", port).sync();
-        log.info("netty server started on port {}", port);
+        try {
+            log.info("启动netty容器");
+            EventLoopGroup bossGroup = new NioEventLoopGroup();
+            EventLoopGroup workerGroup = new NioEventLoopGroup();
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new NettyServerChannelInitializer(providerMap))
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+            int port = 8888;
+            bootstrap.bind("127.0.0.1", port).sync();
+            log.info("netty server started on port {}", port);
+        } catch (InterruptedException e) {
+            System.exit(-1);
+            log.error("netty 容器启动失败 : {}", e);
+        }
     }
 }
