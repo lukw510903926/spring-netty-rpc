@@ -13,6 +13,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +65,8 @@ public class NettyServer implements InitializingBean, ApplicationContextAware {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+        bootstrap.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
                 .childHandler(new NettyServerChannelInitializer(providerMap))
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
