@@ -12,13 +12,13 @@ import java.io.Serializable;
  * @since 2019/1/17 18:06
  **/
 @Data
-public class NettyResponse<T> implements Serializable {
+public class NettyResponse implements Serializable {
 
     private static final long serialVersionUID = 5963497554185024809L;
 
     private String responseId;
 
-    private T data;
+    private Object data;
 
     private Boolean success;
 

@@ -56,15 +56,16 @@ public class NettyServer implements InitializingBean, ApplicationContextAware {
 
     private void startNettyServer() {
 
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             log.info("启动netty容器");
-            EventLoopGroup bossGroup = new NioEventLoopGroup();
-            EventLoopGroup workerGroup = new NioEventLoopGroup();
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new NettyServerChannelInitializer(providerMap))
                     .option(ChannelOption.SO_BACKLOG, 128)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             int port = 8888;
             bootstrap.bind("127.0.0.1", port).sync();
