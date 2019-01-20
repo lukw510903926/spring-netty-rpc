@@ -1,6 +1,7 @@
 package com.spring.netty.common.client;
 
 import com.alibaba.fastjson.JSONObject;
+import com.spring.netty.common.listener.ConnectionListener;
 import com.spring.netty.common.remote.NettyRequest;
 import com.spring.netty.common.util.ClientManger;
 import io.netty.bootstrap.Bootstrap;
@@ -9,13 +10,14 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.net.InetSocketAddress;
 
 @Slf4j
-public class NettyClient implements InitializingBean ,Client{
+public class NettyClient implements InitializingBean, Client {
 
     private String host = "127.0.0.1";
 
@@ -36,34 +38,38 @@ public class NettyClient implements InitializingBean ,Client{
         this.port = port;
     }
 
-    private Channel start() throws Exception {
+    @Override
+    public Channel start(EventLoopGroup group, Bootstrap bootstrap) {
 
-        EventLoopGroup group = new NioEventLoopGroup();
-        Bootstrap b = new Bootstrap();
-        b.group(group) // 注册线程池
-                .channel(NioSocketChannel.class) // 使用NioSocketChannel来作为连接用的channel类
-                .remoteAddress(new InetSocketAddress(this.host, this.port)) // 绑定连接端口和host信息
-                .handler(new NettyClientChannelInitializer());
-        ChannelFuture channelFuture = b.connect().sync(); // 异步连接服务器
-        return channelFuture.channel();
+        try {
+            bootstrap.group(group) // 注册线程池
+                    .channel(NioSocketChannel.class) // 使用NioSocketChannel来作为连接用的channel类
+                    .remoteAddress(new InetSocketAddress(this.host, this.port)) // 绑定连接端口和host信息
+                    .handler(new NettyClientChannelInitializer());
+            // 异步连接服务器
+            ChannelFuture channelFuture = bootstrap.connect().addListener(new ConnectionListener(this)).sync();
+            return channelFuture.channel();
+        } catch (InterruptedException e) {
+            log.info("netty 容器启动失败 ： {}", e);
+            System.exit(-1);
+        }
+        return null;
     }
 
     @Override
-    public void request(NettyRequest nettyRequest) {
+    public Object request(NettyRequest nettyRequest) {
 
         this.channel.writeAndFlush(JSONObject.toJSONString(nettyRequest));
+        return this.channel.attr(AttributeKey.valueOf(nettyRequest.getRequestId())).get();
     }
 
     @Override
     public void afterPropertiesSet() {
 
-        try {
-            NettyClient client = new NettyClient("127.0.0.1", 8888);
-            channel = client.start();
-            ClientManger.addClient(this);
-        } catch (Exception e) {
-            System.exit(-1);
-            log.error("netty 启动失败 : {}", e);
-        }
+        NettyClient client = new NettyClient("127.0.0.1", 8888);
+        EventLoopGroup group = new NioEventLoopGroup();
+        Bootstrap bootstrap = new Bootstrap();
+        channel = client.start(group, bootstrap);
+        ClientManger.addClient(this);
     }
 }

@@ -4,6 +4,7 @@ import com.spring.netty.api.PersonService;
 import com.spring.netty.common.annotation.Client;
 import com.spring.netty.common.client.NettyClient;
 import com.spring.netty.common.remote.NettyRequest;
+import com.spring.netty.common.util.IdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,23 +31,21 @@ public class NettyController {
     private PersonService personService;
 
     @GetMapping("list")
-    public String list(){
+    public Object list(){
 
         NettyRequest nettyRequest = new NettyRequest();
-        nettyRequest.setRequestId(UUID.randomUUID().toString());
+        nettyRequest.setRequestId(IdUtil.uuid());
         nettyRequest.setArgs(new Object[]{});
         nettyRequest.setInterfaceName(PersonService.class.getName());
         nettyRequest.setMethodName("list");
         nettyRequest.setParameterTypes(new Class<?>[]{});
-        nettyClient.request(nettyRequest);
-        return "success";
+        return nettyClient.request(nettyRequest);
     }
 
     @GetMapping("proxy")
-    public String proxy(){
+    public Object proxy(){
 
-        personService.list();
-        return "success";
+        return personService.list();
     }
 
     @GetMapping("getByName")

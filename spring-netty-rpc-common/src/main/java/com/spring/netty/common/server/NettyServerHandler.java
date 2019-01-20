@@ -63,6 +63,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             try {
                 Method method = instance.getClass().getMethod(nettyRequest.getMethodName(), nettyRequest.getParameterTypes());
                 Object result = method.invoke(instance, nettyRequest.getArgs());
+                response.setSuccess(true);
                 response.setData(result);
             } catch (NoSuchMethodException | SecurityException e) {
                 response.setException(new RpcException(nettyRequest.getMethodName() + " 方法不存在"));
