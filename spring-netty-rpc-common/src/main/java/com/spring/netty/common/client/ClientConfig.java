@@ -5,8 +5,7 @@ import com.spring.netty.common.proxy.ProxyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -21,38 +20,33 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2019/1/18 11:37
  **/
 @Slf4j
-public class ClientConfig implements ApplicationContextAware {
+public class ClientConfig implements BeanPostProcessor {
 
     private Map<Class<?>, Object> instanceMap = new ConcurrentHashMap<>();
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 
-        String[] names = applicationContext.getBeanDefinitionNames();
-        if(ArrayUtils.isNotEmpty(names)){
-           Arrays.asList(names).forEach(name -> {
-               Object bean = applicationContext.getBean(name);
-               Field[] fields = bean.getClass().getDeclaredFields();
-                if (ArrayUtils.isNotEmpty(fields)) {
-                    try {
-                        for (Field field : Arrays.asList(fields)) {
-                            if (field.isAnnotationPresent(Client.class)) {
-                                Class<?> type = field.getType();
-                                Object instance = instanceMap.get(type);
-                                if (instance == null) {
-                                    instance = ProxyUtil.create(type);
-                                    instanceMap.put(type, instance);
-                                }
-                                field.setAccessible(true);
-                                field.set(bean, instance);
-                            }
+        Field[] fields = bean.getClass().getDeclaredFields();
+        if (ArrayUtils.isNotEmpty(fields)) {
+            try {
+                for (Field field : Arrays.asList(fields)) {
+                    if (field.isAnnotationPresent(Client.class)) {
+                        Class<?> type = field.getType();
+                        Object instance = instanceMap.get(type);
+                        if (instance == null) {
+                            instance = ProxyUtil.create(type);
+                            instanceMap.put(type, instance);
                         }
-                    } catch (Exception e) {
-                        System.exit(-1);
-                        log.error("注入失败 : {}", e);
+                        field.setAccessible(true);
+                        field.set(bean, instance);
                     }
                 }
-            });
+            } catch (Exception e) {
+                System.exit(-1);
+                log.error("注入失败 : {}", e);
+            }
         }
+        return bean;
     }
 }
