@@ -78,7 +78,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * 功能：读取完毕客户端发送过来的数据之后的操作
      */
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(ChannelHandlerContext ctx) {
 
         log.info("服务端接收数据完毕..");
         // 第一种方法：写一个空的buf，并刷新写出区域。完成后关闭sock channel连接。
