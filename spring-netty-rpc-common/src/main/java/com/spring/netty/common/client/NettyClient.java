@@ -65,7 +65,7 @@ public class NettyClient implements InitializingBean, Client {
     public Object request(NettyRequest nettyRequest) {
 
         this.channel.writeAndFlush(JSONObject.toJSONString(nettyRequest));
-        DefaultFuture future = new DefaultFuture(nettyRequest);
+        DefaultFuture future = new DefaultFuture(nettyRequest,10*1000);
         return future.get().getData();
     }
 
