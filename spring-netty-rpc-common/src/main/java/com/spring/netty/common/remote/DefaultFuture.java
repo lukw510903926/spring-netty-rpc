@@ -1,11 +1,11 @@
 package com.spring.netty.common.remote;
 
+import com.spring.netty.common.exception.TimeOutException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -21,7 +21,7 @@ public class DefaultFuture {
 
     private NettyResponse response;
 
-    private long created = System.currentTimeMillis();
+    private long start = System.currentTimeMillis();
 
     /**
      * 默认超时 10秒
@@ -58,20 +58,24 @@ public class DefaultFuture {
 
     public NettyResponse get() {
 
-        lock.lock();
-        try {
-            while (!done()) {
-                if (System.currentTimeMillis() - created > timeOut) {
-                    response = new NettyResponse();
-                    response.setException(new TimeoutException());
-                    break;
+        if (!done()) {
+            long start = System.currentTimeMillis();
+            lock.lock();
+            try {
+                while (!done()) {
+                    condition.await(timeOut, TimeUnit.MILLISECONDS);
+                    if (done() || System.currentTimeMillis() - start > timeOut) {
+                        break;
+                    }
                 }
-                condition.await(timeOut, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                lock.unlock();
             }
-        } catch (Exception e) {
-            log.error("获取response 失败 : {}", e);
-        } finally {
-            lock.unlock();
+            if (!done()) {
+                throw new TimeOutException("请求超时");
+            }
         }
         return this.response;
     }
