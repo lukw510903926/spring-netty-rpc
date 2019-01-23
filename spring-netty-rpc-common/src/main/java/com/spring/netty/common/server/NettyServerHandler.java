@@ -50,7 +50,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        // 第一种：接收字符串时的处理
+
         log.info("服务端收到数据 : {}", msg);
         NettyRequest nettyRequest = JSONObject.parseObject(msg.toString(), NettyRequest.class);
         Object instance = instanceMap.get(nettyRequest.getInterfaceName());
