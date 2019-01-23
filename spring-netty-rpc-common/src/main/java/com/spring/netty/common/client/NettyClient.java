@@ -12,12 +12,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
-
 import java.net.InetSocketAddress;
 
 @Slf4j
-public class NettyClient implements InitializingBean, Client {
+public class NettyClient implements  Client {
 
     private String host;
 
@@ -28,7 +26,7 @@ public class NettyClient implements InitializingBean, Client {
     private static final String LOCAL_HOST = "127.0.0.1";
 
     public NettyClient() {
-        this(LOCAL_HOST, 80);
+        this(LOCAL_HOST, 8888);
     }
 
     public NettyClient(int port) {
@@ -38,10 +36,17 @@ public class NettyClient implements InitializingBean, Client {
     public NettyClient(String host, int port) {
         this.host = host;
         this.port = port;
+        create();
+        ClientManger.addClient(this);
     }
 
     @Override
-    public Channel start(EventLoopGroup group, Bootstrap bootstrap) {
+    public boolean isActive() {
+
+        return this.channel.isActive();
+    }
+
+    private Channel start(EventLoopGroup group, Bootstrap bootstrap) {
 
         try {
             bootstrap.group(group) // 注册线程池
@@ -65,17 +70,14 @@ public class NettyClient implements InitializingBean, Client {
     public Object request(NettyRequest nettyRequest) {
 
         this.channel.writeAndFlush(JSONObject.toJSONString(nettyRequest));
-        DefaultFuture future = new DefaultFuture(nettyRequest,10*1000);
+        DefaultFuture future = new DefaultFuture(nettyRequest, 10 * 1000);
         return future.get().getData();
     }
 
-    @Override
-    public void afterPropertiesSet() {
+    private void create() {
 
-        NettyClient client = new NettyClient(LOCAL_HOST, 8888);
         EventLoopGroup group = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
-        channel = client.start(group, bootstrap);
-        ClientManger.addClient(this);
+        channel = this.start(group, bootstrap);
     }
 }

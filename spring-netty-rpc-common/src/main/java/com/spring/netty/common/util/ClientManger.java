@@ -1,13 +1,12 @@
 package com.spring.netty.common.util;
 
 import com.spring.netty.common.client.Client;
-import com.spring.netty.common.exception.ChannelException;
-import io.netty.channel.Channel;
+import com.spring.netty.common.client.NettyClient;
 import org.apache.commons.collections4.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -33,7 +32,15 @@ public class ClientManger {
     public static Client getClient() {
 
         if (CollectionUtils.isEmpty(list)) {
-            throw new ChannelException();
+            NettyClient client = new NettyClient();
+            addClient(client);
+            return client;
+        }
+        list = list.stream().filter(Client::isActive).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(list)) {
+            NettyClient client = new NettyClient();
+            addClient(client);
+            return client;
         }
         int index = ThreadLocalRandom.current().nextInt(list.size());
         index = index > 0 ? index - 1 : 0;

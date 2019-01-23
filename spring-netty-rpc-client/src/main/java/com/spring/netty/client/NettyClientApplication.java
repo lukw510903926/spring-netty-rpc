@@ -21,6 +21,6 @@ public class NettyClientApplication {
     public static void main(String[] args) {
 
         SpringApplication.run(NettyClientApplication.class, args);
-        logger.info("netty client application start successfully");
+        logger.info("netty client application startTimeMillis successfully");
     }
 }
