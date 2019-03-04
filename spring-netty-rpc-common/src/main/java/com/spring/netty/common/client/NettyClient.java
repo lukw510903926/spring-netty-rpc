@@ -12,21 +12,25 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
 import java.net.InetSocketAddress;
 
 @Slf4j
 public class NettyClient implements  Client {
 
-    private String host;
+    private Channel channel;
 
     private int port;
 
-    private Channel channel;
+    private String host;
+
+    private static final int LOCAL_PORT = 8765;
 
     private static final String LOCAL_HOST = "127.0.0.1";
 
     public NettyClient() {
-        this(LOCAL_HOST, 8888);
+        this(LOCAL_HOST, LOCAL_PORT);
     }
 
     public NettyClient(int port) {
@@ -34,8 +38,8 @@ public class NettyClient implements  Client {
     }
 
     public NettyClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+        this.host = StringUtils.isBlank(host) ? LOCAL_HOST : host;
+        this.port = port == 0 ? LOCAL_PORT : port;
         create();
         ClientManger.addClient(this);
     }
