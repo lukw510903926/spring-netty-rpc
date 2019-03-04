@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class ClientConfig implements BeanPostProcessor {
         Field[] fields = bean.getClass().getDeclaredFields();
         if (ArrayUtils.isNotEmpty(fields)) {
             try {
-                for (Field field : Arrays.asList(fields)) {
+                for (Field field : fields) {
                     if (field.isAnnotationPresent(Client.class)) {
                         Class<?> type = field.getType();
                         Object instance = instanceMap.get(type);
