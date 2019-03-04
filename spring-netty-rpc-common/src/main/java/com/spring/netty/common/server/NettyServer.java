@@ -9,6 +9,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +31,24 @@ import java.util.Map;
 public class NettyServer implements InitializingBean, ApplicationContextAware {
 
     private Map<String, Object> providerMap = new HashMap<>();
+
+    private int port;
+
+    private String host;
+
+    private static final int LOCAL_PORT = 8765;
+
+    private static final String LOCAL_HOST = "127.0.0.1";
+
+    public NettyServer() {
+        this(LOCAL_HOST, LOCAL_PORT);
+    }
+
+    public NettyServer(String host, int port) {
+
+        this.host = StringUtils.isBlank(host) ? LOCAL_HOST : host;
+        this.port = port == 0 ? LOCAL_PORT : port;
+    }
 
     @Override
     public void afterPropertiesSet() {
@@ -67,9 +86,8 @@ public class NettyServer implements InitializingBean, ApplicationContextAware {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .option(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
-            int port = 8888;
-            bootstrap.bind("127.0.0.1", port).sync();
-            log.info("netty server started on port {}", port);
+            bootstrap.bind(this.host, this.port).sync();
+            log.info("netty server started on host:{}  port {}", this.host, this.port);
         } catch (InterruptedException e) {
             System.exit(-1);
             log.error("netty 容器启动失败 : {}", e);
