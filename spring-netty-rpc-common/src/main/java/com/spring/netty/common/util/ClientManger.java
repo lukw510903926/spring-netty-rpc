@@ -20,7 +20,7 @@ public class ClientManger {
 
     private static List<Client> list = new ArrayList<>();
 
-    private static final Class<?> LOCK = Object.class;
+    private static final Object LOCK = Object.class;
 
     public static void addClient(Client client) {
 
@@ -42,8 +42,6 @@ public class ClientManger {
             addClient(client);
             return client;
         }
-        int index = ThreadLocalRandom.current().nextInt(list.size());
-        index = index > 0 ? index - 1 : 0;
-        return list.get(index);
+        return list.get(ThreadLocalRandom.current().nextInt(list.size()));
     }
 }
