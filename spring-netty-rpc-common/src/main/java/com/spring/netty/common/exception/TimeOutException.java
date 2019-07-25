@@ -10,6 +10,8 @@ package com.spring.netty.common.exception;
  **/
 public class TimeOutException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
     public TimeOutException() {
         super();
     }
