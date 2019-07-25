@@ -1,9 +1,6 @@
 package com.spring.netty.common.client;
 
 import com.spring.netty.common.remote.NettyRequest;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.EventLoopGroup;
 
 /**
  * <p>
