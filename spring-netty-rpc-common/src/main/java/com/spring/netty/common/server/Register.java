@@ -15,7 +15,7 @@ public interface Register{
      * @author: yangqi 
      * @since: 2019-07-26 23:15:31
     */
-    void register(String interfaceName,ProviderInfo providerInfo);
+    void register();
 
     /**
      * @description: 订阅
@@ -23,4 +23,11 @@ public interface Register{
      * @since: 2019-07-26 23:16:11
     */
     List<ProviderInfo> subscribe(String interfaceName);
+
+    /**
+     * @description: 接口注销
+     * @author: yangqi 
+     * @since: 2019-07-27 15:50:11
+    */
+    void logout();
 }
