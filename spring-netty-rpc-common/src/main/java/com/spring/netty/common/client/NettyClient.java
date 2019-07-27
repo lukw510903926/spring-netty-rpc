@@ -3,7 +3,6 @@ package com.spring.netty.common.client;
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.remote.DefaultFuture;
 import com.spring.netty.common.remote.NettyRequest;
-import com.spring.netty.common.util.ClientManger;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -41,7 +40,6 @@ public class NettyClient implements  Client {
         this.host = StringUtils.isBlank(host) ? LOCAL_HOST : host;
         this.port = port == 0 ? LOCAL_PORT : port;
         create();
-        ClientManger.addClient(this);
     }
 
     @Override
