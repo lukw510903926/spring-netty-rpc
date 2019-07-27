@@ -17,6 +17,12 @@ import com.spring.netty.common.server.Register;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @description: 订阅 provider
+ * @email:lkw510903926@163.com
+ * @author: yangqi 
+ * @since: 2019-07-27 22:40:03
+*/
 @Data
 @Slf4j
 public class SubscribeProvider implements BeanPostProcessor {
