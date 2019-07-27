@@ -24,29 +24,20 @@ import java.util.stream.Collectors;
  **/
 public class ClientManger {
 
-    private static List<Client> list = new ArrayList<>();
-
-    private static final Object LOCK = Object.class;
-
     private static Map<String, List<Client>> clientMap = new HashMap<>(16);
 
-    public static void addClient(Client client) {
-
-        synchronized (LOCK) {
-            list.add(client);
-        }
-    }
     public static Client getClient(String interfaceName) {
 
         List<Client> clients = clientMap.get(interfaceName);
         if (CollectionUtils.isEmpty(clients)) {
-           createClient(interfaceName);
+            createClient(interfaceName);
+            clients = clientMap.get(interfaceName);
         }
         clients = clients.stream().filter(Client::isActive).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(list)) {
+        if (CollectionUtils.isEmpty(clients)) {
             createClient(interfaceName);
+            clients = clientMap.get(interfaceName);
         }
-        clients =  clientMap.get(interfaceName);
         return clients.get(ThreadLocalRandom.current().nextInt(clients.size()));
     }
 
