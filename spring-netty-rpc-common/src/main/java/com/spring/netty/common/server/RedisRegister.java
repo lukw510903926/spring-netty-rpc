@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.annotation.Provider;
 import com.spring.netty.common.exception.ProviderException;
@@ -36,6 +39,7 @@ public class RedisRegister implements Register, ApplicationContextAware {
 
     private Integer port;
 
+    @PostConstruct
     public void init() {
         localHost = new HostInfo();
         localHost.setIp(IpUtils.localHost());
@@ -98,7 +102,7 @@ public class RedisRegister implements Register, ApplicationContextAware {
         if (MapUtils.isEmpty(beans)) {
             return;
         }
-        beans.forEach((key,bean)->{
+        beans.forEach((key, bean) -> {
             Class<?>[] interfaces = bean.getClass().getInterfaces();
             if (ArrayUtils.isNotEmpty(interfaces)) {
                 String interfaceName;
@@ -119,11 +123,16 @@ public class RedisRegister implements Register, ApplicationContextAware {
                     });
                     if (CollectionUtils.isNotEmpty(reuslt)) {
                         redisTemplate.opsForValue().set(key, JSONObject.toJSONString(list));
-                    }else{
+                    } else {
                         redisTemplate.delete(key);
                     }
                 }
             }
         });
+    }
+
+    @PreDestroy
+    public void destroy() {
+        logout();
     }
 }
