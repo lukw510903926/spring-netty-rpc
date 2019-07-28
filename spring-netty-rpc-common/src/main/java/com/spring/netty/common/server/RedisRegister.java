@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.annotation.Provider;
 import com.spring.netty.common.exception.ProviderException;
@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -29,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisRegister implements Register, ApplicationContextAware {
 
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     private final String KEY_PREFIX = "reids:provider:";
 
@@ -65,20 +64,27 @@ public class RedisRegister implements Register, ApplicationContextAware {
                 for (Class<?> instance : interfaces) {
                     interfaceName = instance.getCanonicalName();
                     Method[] methods = instance.getMethods();
+                    List<String> methodNames = new ArrayList<>(10);
+                    if(ArrayUtils.isNotEmpty(methods)){
+                        Stream.of(methods).forEach(method ->{
+                            methodNames.add(method.getName());
+                        });
+
+                    }
                     ProviderInfo providerInfo = new ProviderInfo();
                     providerInfo.setHost(localHost);
-                    providerInfo.setMethods(Arrays.asList(methods));
+                    providerInfo.setMethods(methodNames);
                     String interfaceNameKey = KEY_PREFIX + interfaceName;
-                    String provider = redisTemplate.opsForValue().get(interfaceNameKey);
+                    Object provider = redisTemplate.opsForValue().get(interfaceNameKey);
                     List<ProviderInfo> providers;
-                    if (StringUtils.isNotEmpty(provider)) {
-                        providers = JSONObject.parseArray(provider, ProviderInfo.class);
+                    if (provider != null) {
+                        providers = (List<ProviderInfo>) provider;
                     } else {
                         providers = new ArrayList<>(16);
                     }
                     providers.add(providerInfo);
                     log.info("register interfaceName {}", interfaceName);
-                    redisTemplate.opsForValue().set(key, JSONObject.toJSONString(providers));
+                    redisTemplate.opsForValue().set(interfaceNameKey, providers);
                 }
             }
         });
@@ -88,11 +94,11 @@ public class RedisRegister implements Register, ApplicationContextAware {
     public List<ProviderInfo> subscribe(String interfaceName) {
 
         String key = KEY_PREFIX + interfaceName;
-        String provider = redisTemplate.opsForValue().get(key);
-        if (StringUtils.isEmpty(provider)) {
+        Object provider = redisTemplate.opsForValue().get(key);
+        if (provider != null) {
             throw new ProviderException("provider is not exist");
         }
-        return JSONObject.parseArray(provider, ProviderInfo.class);
+        return (List<ProviderInfo>) provider;
     }
 
     @Override
@@ -102,6 +108,7 @@ public class RedisRegister implements Register, ApplicationContextAware {
         if (MapUtils.isEmpty(beans)) {
             return;
         }
+        log.info("begin to logout interfaceName");
         beans.forEach((key, bean) -> {
             Class<?>[] interfaces = bean.getClass().getInterfaces();
             if (ArrayUtils.isNotEmpty(interfaces)) {
@@ -109,11 +116,11 @@ public class RedisRegister implements Register, ApplicationContextAware {
                 for (Class<?> instance : interfaces) {
                     interfaceName = instance.getCanonicalName();
                     String interfaceNameKey = KEY_PREFIX + interfaceName;
-                    String provider = redisTemplate.opsForValue().get(interfaceNameKey);
-                    if (StringUtils.isEmpty(provider)) {
+                    Object provider = redisTemplate.opsForValue().get(interfaceNameKey);
+                    if (provider == null) {
                         continue;
                     }
-                    List<ProviderInfo> list = JSONObject.parseArray(provider, ProviderInfo.class);
+                    List<ProviderInfo> list = (List<ProviderInfo>) provider;
                     List<ProviderInfo> reuslt = new ArrayList<>(10);
                     list.forEach(providerInfo -> {
                         HostInfo host = providerInfo.getHost();
@@ -121,10 +128,11 @@ public class RedisRegister implements Register, ApplicationContextAware {
                             reuslt.add(providerInfo);
                         }
                     });
+                    log.info("begin to logout interfaceName {}",interfaceNameKey);
                     if (CollectionUtils.isNotEmpty(reuslt)) {
-                        redisTemplate.opsForValue().set(key, JSONObject.toJSONString(list));
+                        redisTemplate.opsForValue().set(interfaceNameKey, JSONObject.toJSONString(list));
                     } else {
-                        redisTemplate.delete(key);
+                        redisTemplate.delete(interfaceNameKey);
                     }
                 }
             }

@@ -1,8 +1,6 @@
 package com.spring.netty.common.server;
 
-import java.lang.reflect.Method;
 import java.util.List;
-
 import lombok.Data;
 
 /*
@@ -21,5 +19,5 @@ public class ProviderInfo {
     /**
      * 方法列表
      */
-    private List<Method> methods;
+    private List<String> methods;
 }
