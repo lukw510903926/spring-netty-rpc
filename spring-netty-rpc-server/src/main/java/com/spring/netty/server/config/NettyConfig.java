@@ -3,6 +3,7 @@ package com.spring.netty.server.config;
 import com.spring.netty.common.server.NettyServer;
 import com.spring.netty.common.server.RedisRegister;
 import com.spring.netty.common.server.Register;
+import com.spring.netty.common.util.IpUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class NettyConfig {
 
     @Bean
     public NettyServer nettyServer() {
-        return new NettyServer();
+        return new NettyServer(IpUtils.localHost(),8765);
     }
 
     @Bean

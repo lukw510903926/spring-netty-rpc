@@ -1,7 +1,6 @@
 package com.spring.netty.common.server;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -36,7 +35,7 @@ public class RedisRegister implements Register, ApplicationContextAware {
 
     private HostInfo localHost;
 
-    private Integer port;
+    private Integer port = 8765;
 
     @PostConstruct
     public void init() {
@@ -95,7 +94,7 @@ public class RedisRegister implements Register, ApplicationContextAware {
 
         String key = KEY_PREFIX + interfaceName;
         Object provider = redisTemplate.opsForValue().get(key);
-        if (provider != null) {
+        if (provider == null) {
             throw new ProviderException("provider is not exist");
         }
         return (List<ProviderInfo>) provider;
