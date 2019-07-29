@@ -7,7 +7,6 @@ import com.spring.netty.common.server.Register;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -20,7 +19,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
  * @email yangqi@ywwl.com
  * @since 2019/1/18 11:10
  **/
-@Configuration
+// @Configuration
 public class NettyConfig{
 
     @Autowired

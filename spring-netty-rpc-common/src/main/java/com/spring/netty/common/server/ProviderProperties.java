@@ -28,4 +28,9 @@ public class ProviderProperties {
      */
     private Integer port;
 
+    /**
+     * 是否注册接口
+     */
+    private Boolean register = Boolean.TRUE;
+
 }
