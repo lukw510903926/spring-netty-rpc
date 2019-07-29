@@ -7,12 +7,10 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.annotation.Provider;
 import com.spring.netty.common.exception.ProviderException;
 import com.spring.netty.common.util.IpUtils;
 import java.lang.reflect.Method;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeansException;
@@ -70,34 +68,37 @@ public class RedisRegister implements Register, ApplicationContextAware {
                         });
 
                     }
-                    ProviderInfo providerInfo = new ProviderInfo();
-                    providerInfo.setHost(localHost);
-                    providerInfo.setMethods(methodNames);
+
+                    ProviderBean providerBean = new ProviderBean();
+                    providerBean.setMethods(methodNames);
+                    providerBean.setHost(localHost);
+                    providerBean.setServerAddress(localHost.getHost());
+
                     String interfaceNameKey = KEY_PREFIX + interfaceName;
                     Object provider = redisTemplate.opsForValue().get(interfaceNameKey);
-                    List<ProviderInfo> providers;
+                    ProviderInfo providerInfo = new ProviderInfo();
                     if (provider != null) {
-                        providers = (List<ProviderInfo>) provider;
+                        providerInfo = (ProviderInfo) provider;
                     } else {
-                        providers = new ArrayList<>(16);
+                        providerInfo = new ProviderInfo();
                     }
-                    providers.add(providerInfo);
+                    providerInfo.addProvoder(providerBean);
                     log.info("register interfaceName {}", interfaceName);
-                    redisTemplate.opsForValue().set(interfaceNameKey, providers);
+                    redisTemplate.opsForValue().set(interfaceNameKey, providerInfo);
                 }
             }
         });
     }
 
     @Override
-    public List<ProviderInfo> subscribe(String interfaceName) {
+    public ProviderInfo subscribe(String interfaceName) {
 
         String key = KEY_PREFIX + interfaceName;
         Object provider = redisTemplate.opsForValue().get(key);
         if (provider == null) {
             throw new ProviderException("provider is not exist");
         }
-        return (List<ProviderInfo>) provider;
+        return (ProviderInfo) provider;
     }
 
     @Override
@@ -119,19 +120,13 @@ public class RedisRegister implements Register, ApplicationContextAware {
                     if (provider == null) {
                         continue;
                     }
-                    List<ProviderInfo> list = (List<ProviderInfo>) provider;
-                    List<ProviderInfo> reuslt = new ArrayList<>(10);
-                    list.forEach(providerInfo -> {
-                        HostInfo host = providerInfo.getHost();
-                        if (!localHost.equals(host)) {
-                            reuslt.add(providerInfo);
-                        }
-                    });
+                    ProviderInfo providerInfo = (ProviderInfo) provider;
+                    providerInfo.removeProvider(localHost);
                     log.info("begin to logout interfaceName {}",interfaceNameKey);
-                    if (CollectionUtils.isNotEmpty(reuslt)) {
-                        redisTemplate.opsForValue().set(interfaceNameKey, JSONObject.toJSONString(list));
-                    } else {
+                    if (providerInfo.isEmpty()) {
                         redisTemplate.delete(interfaceNameKey);
+                    } else {
+                        redisTemplate.opsForValue().set(interfaceNameKey, providerInfo);
                     }
                 }
             }

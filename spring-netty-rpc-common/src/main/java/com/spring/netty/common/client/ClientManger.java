@@ -43,14 +43,14 @@ public class ClientManger {
 
     private static void createClient(String interfaceName) {
 
-        List<ProviderInfo> providers = SubscribeProvider.providerMap.get(interfaceName);
-        if (CollectionUtils.isEmpty(providers)) {
+        ProviderInfo providers = SubscribeProvider.providerMap.get(interfaceName);
+        if (providers == null || providers.isEmpty()) {
             throw new ProviderException(interfaceName + "provider is not exist");
         }
         List<Client> clients = new ArrayList<>(10);
-        providers.forEach(provider -> {
-            HostInfo host = provider.getHost();
-            Client client = new NettyClient(host.getIp(), host.getPort());
+        providers.getProviderMap().forEach((host, provider) -> {
+            HostInfo HostInfo = provider.getHost();
+            Client client = new NettyClient(HostInfo.getIp(), HostInfo.getPort());
             clients.add(client);
         });
         clientMap.put(interfaceName, clients);

@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>
  *
  * @author yangqi
- * @Description </p>
+ * @Description
+ *              </p>
  * @email yangqi@ywwl.com
  * @since 2019/1/17 17:48
  **/
@@ -22,7 +23,7 @@ public class NettyController {
     private PersonService personService;
 
     @GetMapping("proxy")
-    public Object proxy(){
+    public Object proxy() {
 
         return personService.list();
     }

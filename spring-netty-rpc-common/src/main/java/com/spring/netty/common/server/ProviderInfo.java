@@ -1,6 +1,10 @@
 package com.spring.netty.common.server;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections4.MapUtils;
+
 import lombok.Data;
 
 /*
@@ -11,13 +15,35 @@ import lombok.Data;
 @Data
 public class ProviderInfo {
 
-    /**
-     * 主机信息
-     */
-    private HostInfo host;
+    private Map<String, ProviderBean> providerMap;
 
     /**
-     * 方法列表
+     * @description: 添加provider
+     * @author: yangqi
+     * @since: 2019-07-29 20:00:42
      */
-    private List<String> methods;
+    public void addProvoder(ProviderBean providerBean) {
+
+        if (MapUtils.isEmpty(providerMap)) {
+            providerMap = new HashMap<>(10);
+        }
+        providerMap.put(providerBean.getServerAddress(), providerBean);
+    }
+
+    /**
+     * @description: 移除provider
+     * @author: yangqi
+     * @since: 2019-07-29 20:00:59
+     */
+    public void removeProvider(HostInfo host) {
+
+        if (MapUtils.isEmpty(providerMap)) {
+            return;
+        }
+        providerMap.remove(host.getHost());
+    }
+
+    public boolean isEmpty() {
+        return MapUtils.isEmpty(providerMap);
+    }
 }

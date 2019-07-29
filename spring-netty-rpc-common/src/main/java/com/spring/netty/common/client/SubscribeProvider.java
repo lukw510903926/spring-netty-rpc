@@ -2,10 +2,8 @@ package com.spring.netty.common.client;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -20,14 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @description: 订阅 provider
  * @email:lkw510903926@163.com
- * @author: yangqi 
+ * @author: yangqi
  * @since: 2019-07-27 22:40:03
-*/
+ */
 @Data
 @Slf4j
 public class SubscribeProvider implements BeanPostProcessor {
 
-    public static Map<String, List<ProviderInfo>> providerMap = new HashMap<>(16);
+    public static Map<String, ProviderInfo> providerMap = new HashMap<>(16);
 
     private Register register;
 
@@ -40,12 +38,8 @@ public class SubscribeProvider implements BeanPostProcessor {
                 for (Field field : fields) {
                     if (field.isAnnotationPresent(Client.class)) {
                         Class<?> type = field.getType();
-                        List<ProviderInfo> instance = providerMap.get(type.getCanonicalName());
-                        if (CollectionUtils.isNotEmpty(instance)) {
-                            continue;
-                        }
-                        instance = register.subscribe(type.getCanonicalName());
-                        if (CollectionUtils.isEmpty(instance)) {
+                        ProviderInfo instance = register.subscribe(type.getCanonicalName());
+                        if (instance == null) {
                             throw new ProviderException(type + " provider is not exist");
                         }
                         providerMap.put(type.getCanonicalName(), instance);
