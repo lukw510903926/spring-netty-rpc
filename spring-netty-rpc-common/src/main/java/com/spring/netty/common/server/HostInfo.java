@@ -15,6 +15,10 @@ public class HostInfo {
 
     private Integer port;
 
+    public String getHost() {
+        return this.ip + ':' + this.port;
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -24,25 +28,7 @@ public class HostInfo {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        HostInfo other = (HostInfo) obj;
-        if (ip == null) {
-            if (other.ip != null) {
-                return false;
-            }
-        } else if (!ip.equals(other.ip)) {
-            return false;
-        }
-        if (port == null) {
-            if (other.port != null) {
-                return false;
-            }
-        } else if (!port.equals(other.port)) {
-            return false;
-        }
-        return true;
+        return this.getHost().equals(((HostInfo)obj).getHost());
     }
 
     @Override
