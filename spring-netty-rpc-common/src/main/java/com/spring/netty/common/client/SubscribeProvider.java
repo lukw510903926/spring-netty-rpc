@@ -1,8 +1,8 @@
 package com.spring.netty.common.client;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeansException;
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SubscribeProvider implements BeanPostProcessor {
 
-    public static Map<String, ProviderInfo> providerMap = new HashMap<>(16);
+    public static Map<String, ProviderInfo> providerMap = new ConcurrentHashMap<>(16);
 
     private Register register;
 

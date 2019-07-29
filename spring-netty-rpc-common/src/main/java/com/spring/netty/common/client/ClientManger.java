@@ -7,9 +7,9 @@ import com.spring.netty.common.server.HostInfo;
 import com.spring.netty.common.server.ProviderInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  **/
 public class ClientManger {
 
-    private static Map<String, List<Client>> clientMap = new HashMap<>(16);
+    private static Map<String, List<Client>> clientMap = new ConcurrentHashMap<>(16);
 
     public static Client getClient(String interfaceName) {
 
