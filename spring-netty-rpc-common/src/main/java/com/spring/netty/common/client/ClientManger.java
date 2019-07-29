@@ -49,8 +49,8 @@ public class ClientManger {
         }
         List<Client> clients = new ArrayList<>(10);
         providers.getProviderMap().forEach((host, provider) -> {
-            HostInfo HostInfo = provider.getHost();
-            Client client = new NettyClient(HostInfo.getIp(), HostInfo.getPort());
+            HostInfo hostInfo = provider.getHost();
+            Client client = new NettyClient(hostInfo.getIp(), hostInfo.getPort());
             clients.add(client);
         });
         clientMap.put(interfaceName, clients);
