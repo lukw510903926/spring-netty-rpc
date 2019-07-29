@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Setter
 @Slf4j
-public class RedisRegister implements Register, ApplicationContextAware {
+public class RedisRegister implements Register, ApplicationContextAware, InitializingBean {
 
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -62,8 +63,8 @@ public class RedisRegister implements Register, ApplicationContextAware {
                     interfaceName = instance.getCanonicalName();
                     Method[] methods = instance.getMethods();
                     List<String> methodNames = new ArrayList<>(10);
-                    if(ArrayUtils.isNotEmpty(methods)){
-                        Stream.of(methods).forEach(method ->{
+                    if (ArrayUtils.isNotEmpty(methods)) {
+                        Stream.of(methods).forEach(method -> {
                             methodNames.add(method.getName());
                         });
 
@@ -122,7 +123,7 @@ public class RedisRegister implements Register, ApplicationContextAware {
                     }
                     ProviderInfo providerInfo = (ProviderInfo) provider;
                     providerInfo.removeProvider(localHost);
-                    log.info("begin to logout interfaceName {}",interfaceNameKey);
+                    log.info("begin to logout interfaceName {}", interfaceNameKey);
                     if (providerInfo.isEmpty()) {
                         redisTemplate.delete(interfaceNameKey);
                     } else {
@@ -137,4 +138,10 @@ public class RedisRegister implements Register, ApplicationContextAware {
     public void destroy() {
         logout();
     }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        register();
+    }
+
 }
