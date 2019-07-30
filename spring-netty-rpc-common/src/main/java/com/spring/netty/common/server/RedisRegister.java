@@ -7,26 +7,29 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+
+import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.annotation.Provider;
 import com.spring.netty.common.exception.ProviderException;
 import com.spring.netty.common.util.IpUtils;
 import java.lang.reflect.Method;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import redis.clients.jedis.Jedis;
 
 @Setter
 @Slf4j
 public class RedisRegister implements Register, ApplicationContextAware, InitializingBean {
 
-    private RedisTemplate<String, Object> redisTemplate;
+    private Jedis jedis;
 
     private final String KEY_PREFIX = "reids:provider:";
 
@@ -69,14 +72,12 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                         });
 
                     }
-
                     ProviderBean providerBean = new ProviderBean();
                     providerBean.setMethods(methodNames);
                     providerBean.setHost(localHost);
                     providerBean.setServerAddress(localHost.getHost());
-
                     String interfaceNameKey = KEY_PREFIX + interfaceName;
-                    Object provider = redisTemplate.opsForValue().get(interfaceNameKey);
+                    Object provider = jedis.get(interfaceNameKey);
                     ProviderInfo providerInfo = new ProviderInfo();
                     if (provider != null) {
                         providerInfo = (ProviderInfo) provider;
@@ -85,7 +86,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                     }
                     providerInfo.addProvoder(providerBean);
                     log.info("register interfaceName {}", interfaceName);
-                    redisTemplate.opsForValue().set(interfaceNameKey, providerInfo);
+                    jedis.set(interfaceNameKey, JSONObject.toJSONString(providerInfo));
                 }
             }
         });
@@ -95,7 +96,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
     public ProviderInfo subscribe(String interfaceName) {
 
         String key = KEY_PREFIX + interfaceName;
-        Object provider = redisTemplate.opsForValue().get(key);
+        Object provider = jedis.get(key);
         if (provider == null) {
             throw new ProviderException("provider is not exist");
         }
@@ -117,17 +118,17 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                 for (Class<?> instance : interfaces) {
                     interfaceName = instance.getCanonicalName();
                     String interfaceNameKey = KEY_PREFIX + interfaceName;
-                    Object provider = redisTemplate.opsForValue().get(interfaceNameKey);
-                    if (provider == null) {
+                    String provider = jedis.get(interfaceNameKey);
+                    if (StringUtils.isEmpty(provider)) {
                         continue;
                     }
-                    ProviderInfo providerInfo = (ProviderInfo) provider;
+                    ProviderInfo providerInfo = JSONObject.parseObject(provider,ProviderInfo.class);
                     providerInfo.removeProvider(localHost);
                     log.info("begin to logout interfaceName {}", interfaceNameKey);
                     if (providerInfo.isEmpty()) {
-                        redisTemplate.delete(interfaceNameKey);
+                        jedis.del(interfaceNameKey);
                     } else {
-                        redisTemplate.opsForValue().set(interfaceNameKey, providerInfo);
+                        jedis.set(interfaceNameKey, JSONObject.toJSONString(providerInfo));
                     }
                 }
             }
