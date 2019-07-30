@@ -1,5 +1,6 @@
 package com.spring.netty.common.server;
 
+import com.spring.netty.common.register.Register;
 import com.spring.netty.common.util.IpUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

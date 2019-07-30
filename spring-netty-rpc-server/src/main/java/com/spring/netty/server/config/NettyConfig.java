@@ -1,7 +1,8 @@
 package com.spring.netty.server.config;
 
-import com.spring.netty.common.server.RedisRegister;
-import com.spring.netty.common.server.Register;
+import com.spring.netty.common.register.RedisRegister;
+import com.spring.netty.common.register.Register;
+
 import org.springframework.context.annotation.Bean;
 
 /**

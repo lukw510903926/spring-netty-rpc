@@ -9,8 +9,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import com.spring.netty.common.annotation.Client;
 import com.spring.netty.common.exception.ProviderException;
+import com.spring.netty.common.register.Register;
 import com.spring.netty.common.server.ProviderInfo;
-import com.spring.netty.common.server.Register;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

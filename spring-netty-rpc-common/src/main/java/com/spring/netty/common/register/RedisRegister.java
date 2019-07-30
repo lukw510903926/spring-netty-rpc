@@ -1,4 +1,4 @@
-package com.spring.netty.common.server;
+package com.spring.netty.common.register;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,9 @@ import javax.annotation.PreDestroy;
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.annotation.Provider;
 import com.spring.netty.common.exception.ProviderException;
+import com.spring.netty.common.server.HostInfo;
+import com.spring.netty.common.server.ProviderBean;
+import com.spring.netty.common.server.ProviderInfo;
 import com.spring.netty.common.util.IpUtils;
 import java.lang.reflect.Method;
 import org.apache.commons.collections4.MapUtils;
@@ -24,12 +27,14 @@ import org.springframework.context.ApplicationContextAware;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 @Setter
 @Slf4j
 public class RedisRegister implements Register, ApplicationContextAware, InitializingBean {
 
-    private Jedis jedis;
+    private RegisterProperties registerProperties;
 
     private final String KEY_PREFIX = "reids:provider:";
 
@@ -39,11 +44,14 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
 
     private Integer port = 8765;
 
+    private JedisPool jedisPool;
+
     @PostConstruct
     public void init() {
         localHost = new HostInfo();
         localHost.setIp(IpUtils.localHost());
         localHost.setPort(port);
+        initJedisPool();
     }
 
     @Override
@@ -58,6 +66,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
         if (MapUtils.isEmpty(beans)) {
             return;
         }
+        Jedis jedis = jedisPool.getResource();
         beans.forEach((key, bean) -> {
             Class<?>[] interfaces = bean.getClass().getInterfaces();
             if (ArrayUtils.isNotEmpty(interfaces)) {
@@ -67,20 +76,18 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                     Method[] methods = instance.getMethods();
                     List<String> methodNames = new ArrayList<>(10);
                     if (ArrayUtils.isNotEmpty(methods)) {
-                        Stream.of(methods).forEach(method -> {
-                            methodNames.add(method.getName());
-                        });
-
+                        Stream.of(methods).forEach(method -> methodNames.add(method.getName()));
                     }
                     ProviderBean providerBean = new ProviderBean();
                     providerBean.setMethods(methodNames);
                     providerBean.setHost(localHost);
                     providerBean.setServerAddress(localHost.getHost());
                     String interfaceNameKey = KEY_PREFIX + interfaceName;
-                    Object provider = jedis.get(interfaceNameKey);
-                    ProviderInfo providerInfo = new ProviderInfo();
-                    if (provider != null) {
-                        providerInfo = (ProviderInfo) provider;
+
+                    String provider = jedis.get(interfaceNameKey);
+                    ProviderInfo providerInfo;
+                    if (StringUtils.isEmpty(provider)) {
+                        providerInfo = JSONObject.parseObject(provider, ProviderInfo.class);
                     } else {
                         providerInfo = new ProviderInfo();
                     }
@@ -90,17 +97,20 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                 }
             }
         });
+        closeJedis(jedis);
     }
 
     @Override
     public ProviderInfo subscribe(String interfaceName) {
 
         String key = KEY_PREFIX + interfaceName;
-        Object provider = jedis.get(key);
-        if (provider == null) {
+        Jedis jedis = jedisPool.getResource();
+        String provider = jedis.get(key);
+        if (StringUtils.isEmpty(provider)) {
             throw new ProviderException("provider is not exist");
         }
-        return (ProviderInfo) provider;
+        closeJedis(jedis);
+        return JSONObject.parseObject(provider, ProviderInfo.class);
     }
 
     @Override
@@ -110,6 +120,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
         if (MapUtils.isEmpty(beans)) {
             return;
         }
+        Jedis jedis = jedisPool.getResource();
         log.info("begin to logout interfaceName");
         beans.forEach((key, bean) -> {
             Class<?>[] interfaces = bean.getClass().getInterfaces();
@@ -122,7 +133,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                     if (StringUtils.isEmpty(provider)) {
                         continue;
                     }
-                    ProviderInfo providerInfo = JSONObject.parseObject(provider,ProviderInfo.class);
+                    ProviderInfo providerInfo = JSONObject.parseObject(provider, ProviderInfo.class);
                     providerInfo.removeProvider(localHost);
                     log.info("begin to logout interfaceName {}", interfaceNameKey);
                     if (providerInfo.isEmpty()) {
@@ -133,6 +144,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                 }
             }
         });
+        closeJedis(jedis);
     }
 
     @PreDestroy
@@ -145,4 +157,22 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
         register();
     }
 
+    private void initJedisPool() {
+
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setTestOnBorrow(true);
+        config.setTestOnReturn(true);
+        config.setTestWhileIdle(true);
+        String host = registerProperties.getRegisterIp();
+        Integer port = registerProperties.getRegisterPort();
+        Integer timeOut = registerProperties.getRegisterTimeOut();
+        jedisPool = new JedisPool(config, host, port, timeOut);
+    }
+
+    private void closeJedis(Jedis jedis) {
+
+        if (jedis != null) {
+            jedis.close();
+        }
+    }
 }

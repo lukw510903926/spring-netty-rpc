@@ -1,6 +1,6 @@
 package com.spring.netty.common.client;
 
-import com.spring.netty.common.server.Register;
+import com.spring.netty.common.register.Register;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
 package com.spring.netty.server.config;
 
-import com.spring.netty.common.server.Register;
+import com.spring.netty.common.register.Register;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

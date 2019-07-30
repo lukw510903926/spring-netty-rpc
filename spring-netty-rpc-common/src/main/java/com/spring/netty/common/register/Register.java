@@ -1,4 +1,6 @@
-package com.spring.netty.common.server;
+package com.spring.netty.common.register;
+
+import com.spring.netty.common.server.ProviderInfo;
 
 /**
  * @description:
