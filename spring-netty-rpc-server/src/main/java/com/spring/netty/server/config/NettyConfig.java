@@ -16,7 +16,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @Description
  *              </p>
  * @email yangqi@ywwl.com
- * @since 2019/1/18 11:12
+ * @since 2019/1/18 11:12w
  **/
 // @Configuration
 public class NettyConfig {

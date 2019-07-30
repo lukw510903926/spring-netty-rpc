@@ -1,10 +1,8 @@
 package com.spring.netty.common.server;
 
-import java.util.HashMap;
 import java.util.Map;
-
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.collections4.MapUtils;
-
 import lombok.Data;
 
 /*
@@ -25,7 +23,7 @@ public class ProviderInfo {
     public void addProvoder(ProviderBean providerBean) {
 
         if (MapUtils.isEmpty(providerMap)) {
-            providerMap = new HashMap<>(10);
+            providerMap = new ConcurrentHashMap<>(10);
         }
         providerMap.put(providerBean.getServerAddress(), providerBean);
     }
