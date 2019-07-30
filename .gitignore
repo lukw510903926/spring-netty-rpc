@@ -9,3 +9,6 @@
 .factorypath
 .project
 */.gitignore
+.vscode
+.
+*/.sts4-cache
