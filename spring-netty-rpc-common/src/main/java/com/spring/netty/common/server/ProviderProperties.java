@@ -7,10 +7,11 @@ import lombok.Data;
 @Data
 @ConfigurationProperties(prefix = "spring.netty.provider")
 public class ProviderProperties {
+    
     /**
      * 服务提供端口
      */
-    private Integer port;
+    private Integer port = 8765;
 
     /**
      * 是否注册接口

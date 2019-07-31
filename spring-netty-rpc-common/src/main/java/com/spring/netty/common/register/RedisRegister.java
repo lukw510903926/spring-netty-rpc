@@ -14,6 +14,7 @@ import com.spring.netty.common.exception.ProviderException;
 import com.spring.netty.common.server.HostInfo;
 import com.spring.netty.common.server.ProviderBean;
 import com.spring.netty.common.server.ProviderInfo;
+import com.spring.netty.common.server.ProviderProperties;
 import com.spring.netty.common.util.IpUtils;
 import java.lang.reflect.Method;
 import org.apache.commons.collections4.MapUtils;
@@ -36,22 +37,30 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
 
     private RegisterProperties registerProperties;
 
+    private ProviderProperties providerProperties;
+
     private final String KEY_PREFIX = "reids:provider:";
 
     private ApplicationContext applicationContext;
 
     private HostInfo localHost;
 
-    private Integer port = 8765;
-
     private JedisPool jedisPool;
+
+    private String rootPath;
 
     @PostConstruct
     public void init() {
+        
         localHost = new HostInfo();
         localHost.setIp(IpUtils.localHost());
-        localHost.setPort(port);
+        localHost.setPort(providerProperties.getPort());
         initJedisPool();
+
+        this.rootPath = registerProperties.getRoot();
+        if(StringUtils.isEmpty(rootPath)){
+            rootPath = KEY_PREFIX;
+        }
     }
 
     @Override
@@ -82,7 +91,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                     providerBean.setMethods(methodNames);
                     providerBean.setHost(localHost);
                     providerBean.setServerAddress(localHost.getHost());
-                    String interfaceNameKey = KEY_PREFIX + interfaceName;
+                    String interfaceNameKey = rootPath + interfaceName;
 
                     String provider = jedis.get(interfaceNameKey);
                     ProviderInfo providerInfo;
@@ -103,7 +112,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
     @Override
     public ProviderInfo subscribe(String interfaceName) {
 
-        String key = KEY_PREFIX + interfaceName;
+        String key = rootPath + interfaceName;
         Jedis jedis = jedisPool.getResource();
         String provider = jedis.get(key);
         if (StringUtils.isEmpty(provider)) {
@@ -128,7 +137,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
                 String interfaceName;
                 for (Class<?> instance : interfaces) {
                     interfaceName = instance.getCanonicalName();
-                    String interfaceNameKey = KEY_PREFIX + interfaceName;
+                    String interfaceNameKey = rootPath + interfaceName;
                     String provider = jedis.get(interfaceNameKey);
                     if (StringUtils.isEmpty(provider)) {
                         continue;
@@ -163,9 +172,9 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
         config.setTestOnBorrow(true);
         config.setTestOnReturn(true);
         config.setTestWhileIdle(true);
-        String host = registerProperties.getRegisterIp();
-        Integer port = registerProperties.getRegisterPort();
-        Integer timeOut = registerProperties.getRegisterTimeOut();
+        String host = registerProperties.getHost();
+        Integer port = registerProperties.getPort();
+        Integer timeOut = registerProperties.getTimeOut();
         jedisPool = new JedisPool(config, host, port, timeOut);
     }
 

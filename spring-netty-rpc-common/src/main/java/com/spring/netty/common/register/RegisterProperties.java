@@ -11,17 +11,25 @@ public class RegisterProperties{
     /**
      * 注册中心类型
      */
-    private String registerType;
+    private String type;
 
     /**
      * 注册中心IP
      */
-    private String registerIp;
+    private String host;
 
     /**
      * 注册中心端口
      */
-    private Integer registerPort;
+    private Integer port;
 
-    private Integer registerTimeOut;
+    /**
+     * 超时
+     */
+    private Integer timeOut;
+
+    /**
+     * 注册中心根节点
+     */
+    private String root;
 }
