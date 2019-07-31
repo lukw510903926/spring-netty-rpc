@@ -95,7 +95,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
 
                     String provider = jedis.get(interfaceNameKey);
                     ProviderInfo providerInfo;
-                    if (StringUtils.isEmpty(provider)) {
+                    if (StringUtils.isNotEmpty(provider)) {
                         providerInfo = JSONObject.parseObject(provider, ProviderInfo.class);
                     } else {
                         providerInfo = new ProviderInfo();

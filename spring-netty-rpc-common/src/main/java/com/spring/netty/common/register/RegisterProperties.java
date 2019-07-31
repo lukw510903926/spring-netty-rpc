@@ -11,25 +11,25 @@ public class RegisterProperties{
     /**
      * 注册中心类型
      */
-    private String type;
+    private String type =  "redis";
 
     /**
      * 注册中心IP
      */
-    private String host;
+    private String host = "127.0.0.1";
 
     /**
      * 注册中心端口
      */
-    private Integer port;
+    private Integer port = 6379;
 
     /**
      * 超时
      */
-    private Integer timeOut;
+    private Integer timeOut = 30;
 
     /**
      * 注册中心根节点
      */
-    private String root;
+    private String root = "netty.provider:";
 }
