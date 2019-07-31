@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.spring.netty.common.register.RegisterAutoConfiguration,\
+com.spring.netty.common.server.ProviderAutoConfiguration
