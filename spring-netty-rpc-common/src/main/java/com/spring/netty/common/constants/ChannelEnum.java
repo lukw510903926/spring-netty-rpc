@@ -1,25 +1,24 @@
 package com.spring.netty.common.constants;
 
-public enum RegisterEnventType{
-    
-    /**
-     * 注册接口
+public enum ChannelEnum{
+
+     /**
+     * 注册
      */
     REGISTER("register"),
 
     /**
-     * 下线接口
+     * 订阅
      */
-    UN_REGISTER("unRegister")
-    ;
+    SUBSCRIBE("subscribe");
 
     private String desc;
 
-    RegisterEnventType(String desc){
+    ChannelEnum(String desc){
         this.desc = desc;
     }
 
-    public String getDesc() {
+   public String  getDesc(){
         return this.desc;
     }
 }
