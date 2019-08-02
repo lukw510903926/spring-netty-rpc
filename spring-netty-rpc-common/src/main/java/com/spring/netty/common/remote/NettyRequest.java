@@ -3,6 +3,7 @@ package com.spring.netty.common.remote;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * <p>
@@ -26,4 +27,6 @@ public class NettyRequest implements Serializable {
     private Object[] args;
 
     private Class<?>[] parameterTypes;
+
+    private Map<String,Object> context;
 }
