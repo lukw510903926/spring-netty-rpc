@@ -1,5 +1,6 @@
 package com.spring.netty.common.register;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +11,16 @@ import javax.annotation.PreDestroy;
 
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.annotation.Provider;
+import com.spring.netty.common.constants.ChannelEnum;
+import com.spring.netty.common.constants.RegisterEnventType;
+import com.spring.netty.common.domain.RegisterEnvent;
 import com.spring.netty.common.exception.ProviderException;
 import com.spring.netty.common.server.HostInfo;
 import com.spring.netty.common.server.ProviderBean;
 import com.spring.netty.common.server.ProviderInfo;
 import com.spring.netty.common.server.ProviderProperties;
 import com.spring.netty.common.util.IpUtils;
-import java.lang.reflect.Method;
+
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,14 +55,14 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
 
     @PostConstruct
     public void init() {
-        
+
         localHost = new HostInfo();
         localHost.setIp(IpUtils.localHost());
         localHost.setPort(providerProperties.getPort());
         initJedisPool();
 
         this.rootPath = registerProperties.getRoot();
-        if(StringUtils.isEmpty(rootPath)){
+        if (StringUtils.isEmpty(rootPath)) {
             rootPath = KEY_PREFIX;
         }
     }
@@ -183,5 +187,26 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
         if (jedis != null) {
             jedis.close();
         }
+    }
+
+    @Override
+    public void push(String interfaceName) {
+
+      Jedis jedis =jedisPool.getResource();
+      RegisterEnvent registerEnvent = new RegisterEnvent();
+      registerEnvent.setInterfaceName(interfaceName);
+      registerEnvent.setEnvent(RegisterEnventType.REGISTER.getDesc());
+      jedis.publish(ChannelEnum.REGISTER.getChannel(), JSONObject.toJSONString(registerEnvent));
+      closeJedis(jedis);
+    }
+
+
+
+    @Override
+    public void subscribeEvent() {
+
+        Jedis jedis = jedisPool.getResource();
+        jedis.subscribe(new SubscribeProvider(), ChannelEnum.REGISTER.getChannel());
+        closeJedis(jedis);
     }
 }

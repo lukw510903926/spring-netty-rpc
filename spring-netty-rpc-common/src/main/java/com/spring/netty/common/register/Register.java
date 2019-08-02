@@ -18,11 +18,22 @@ public interface Register {
     void register();
 
     /**
+     * 发布事件
+     * @param interfaceName
+     */
+    void push(String interfaceName);
+
+    /**
      * @description: 订阅
      * @author: yangqi
      * @since: 2019-07-26 23:16:11
      */
     ProviderInfo subscribe(String interfaceName);
+
+    /**
+     * 订阅事件 
+     */
+    void subscribeEvent();
 
     /**
      * @description: 接口注销

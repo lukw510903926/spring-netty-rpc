@@ -12,13 +12,13 @@ public enum ChannelEnum{
      */
     SUBSCRIBE("subscribe");
 
-    private String desc;
+    private String channel;
 
-    ChannelEnum(String desc){
-        this.desc = desc;
+    ChannelEnum(String channel){
+        this.channel = channel;
     }
 
-   public String  getDesc(){
-        return this.desc;
+   public String  getChannel(){
+        return this.channel;
     }
 }
