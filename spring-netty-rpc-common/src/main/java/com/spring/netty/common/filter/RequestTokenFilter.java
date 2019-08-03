@@ -3,7 +3,6 @@ package com.spring.netty.common.filter;
 import com.spring.netty.common.constants.Constants;
 import com.spring.netty.common.constants.FilterType;
 import com.spring.netty.common.remote.NettyRequest;
-import com.spring.netty.common.remote.NettyResponse;
 import com.spring.netty.common.remote.RpcContext;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -23,7 +22,7 @@ public class RequestTokenFilter implements Filter {
     }
 
     @Override
-    public NettyResponse doFilter(Object object) {
+    public Object doFilter(Object object) {
 
         NettyRequest request = (NettyRequest) object;
         Object[] args = request.getArgs();
@@ -32,7 +31,7 @@ public class RequestTokenFilter implements Filter {
             RpcContext.getContext().put(Constants.TOKEN, token);
         }
         request.setContext(RpcContext.getContext());
-        return null;
+        return object;
     }
 
     @Override

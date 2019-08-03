@@ -1,7 +1,5 @@
 package com.spring.netty.common.filter;
 
-import com.spring.netty.common.remote.NettyResponse;
-
 /**
  * @description: 
  * @email:lkw510903926@163.com
@@ -12,7 +10,7 @@ public interface Filter{
 
     int order();
 
-    NettyResponse doFilter(Object object);
+    Object doFilter(Object object);
 
 
     String filterType();
