@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.exception.RpcException;
 import com.spring.netty.common.remote.NettyRequest;
 import com.spring.netty.common.remote.NettyResponse;
+import com.spring.netty.common.remote.RpcContext;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -55,6 +57,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         NettyRequest nettyRequest = JSONObject.parseObject(msg.toString(), NettyRequest.class);
         Object instance = instanceMap.get(nettyRequest.getInterfaceName());
         NettyResponse response = new NettyResponse();
+        RpcContext.addAll(nettyRequest.getContext());
         response.setResponseId(nettyRequest.getId());
         if (instance == null) {
             response.setException(new RpcException("provider 不存在"));

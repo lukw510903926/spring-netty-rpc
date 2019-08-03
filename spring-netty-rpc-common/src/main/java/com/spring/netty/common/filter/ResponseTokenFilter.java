@@ -1,27 +1,24 @@
 package com.spring.netty.common.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.constants.Constants;
 import com.spring.netty.common.constants.FilterType;
 import com.spring.netty.common.exception.RpcException;
 import com.spring.netty.common.remote.NettyRequest;
 import com.spring.netty.common.remote.Request;
-import com.spring.netty.common.remote.RpcContext;
 import com.spring.netty.common.util.TokenUtil;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * @description: client端生成token
+ * @description:
  * @email:lkw510903926@163.com
  * @author: yangqi
- * @since: 2019-08-03 10:29:04
+ * @since: 2019-08-03 20:59:08
  */
-public class RequestTokenFilter implements Filter {
+public class ResponseTokenFilter implements Filter {
 
     @Override
     public int order() {
@@ -30,13 +27,18 @@ public class RequestTokenFilter implements Filter {
 
     @Override
     public Object doFilter(Object object) {
-
         NettyRequest request = (NettyRequest) object;
         Object[] args = request.getArgs();
+        String requestToken = (String) request.getContext().get(Constants.TOKEN);
+        if (StringUtils.isEmpty(requestToken)) {
+            throw new RpcException("the requst token is empty");
+        }
         String token;
         if (ArrayUtils.isEmpty(args)) {
             token = DigestUtils.md5Hex(request.getId());
-            RpcContext.getContext().put(Constants.TOKEN, token);
+            if (!requestToken.equals(token)) {
+                throw new RpcException(" token validate is fail");
+            }
         }
         if (args.length > 1) {
             throw new RpcException("the max args length is 1");
@@ -47,18 +49,14 @@ public class RequestTokenFilter implements Filter {
         }
         JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(param), JSONObject.class);
         token = TokenUtil.genderToken(jsonObject.getInnerMap(), request.getId());
-        RpcContext.getContext().put(Constants.TOKEN, token);
-        request.setContext(RpcContext.getContext());
+        if (!requestToken.equals(token)) {
+            throw new RpcException(" token validate is fail");
+        }
         return object;
     }
 
     @Override
     public String filterType() {
-        return FilterType.BEFORE_REQUEST.getType();
-    }
-
-    public static void main(String[] args) {
-        
-        System.out.println(List.class.isAssignableFrom(ArrayList.class));
+        return FilterType.BEFORE_RESPONSE.getType();
     }
 }

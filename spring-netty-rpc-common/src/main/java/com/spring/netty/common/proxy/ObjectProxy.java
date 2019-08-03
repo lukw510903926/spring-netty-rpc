@@ -1,6 +1,7 @@
 package com.spring.netty.common.proxy;
 
 import com.spring.netty.common.remote.NettyRequest;
+import com.spring.netty.common.remote.RpcContext;
 import com.spring.netty.common.client.ClientManger;
 import com.spring.netty.common.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,7 @@ public class ObjectProxy<T> implements InvocationHandler {
         request.setParameterTypes(method.getParameterTypes());
         request.setArgs(args);
         request.setInterfaceName(clazz.getName());
+        request.setContext(RpcContext.getContext());
         log.info("request : {}", request);
         return ClientManger.getClient(clazz.getCanonicalName()).request(request);
     }
