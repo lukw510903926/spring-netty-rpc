@@ -43,7 +43,7 @@ public class ObjectProxy<T> implements InvocationHandler {
             }
         }
         NettyRequest request = new NettyRequest();
-        request.setRequestId(IdUtil.uuid());
+        request.setId(IdUtil.uuid());
         request.setMethodName(method.getName());
         request.setParameterTypes(method.getParameterTypes());
         request.setArgs(args);

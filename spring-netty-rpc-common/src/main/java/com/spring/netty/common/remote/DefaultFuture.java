@@ -45,8 +45,8 @@ public class DefaultFuture {
     public DefaultFuture(NettyRequest request, long timeOut) {
 
         this.timeOut = timeOut;
-        this.id = request.getRequestId();
-        futureMap.put(request.getRequestId(), this);
+        this.id = request.getId();
+        futureMap.put(request.getId(), this);
     }
 
     public static void accept(NettyResponse response) {

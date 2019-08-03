@@ -55,7 +55,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         NettyRequest nettyRequest = JSONObject.parseObject(msg.toString(), NettyRequest.class);
         Object instance = instanceMap.get(nettyRequest.getInterfaceName());
         NettyResponse response = new NettyResponse();
-        response.setResponseId(nettyRequest.getRequestId());
+        response.setResponseId(nettyRequest.getId());
         if (instance == null) {
             response.setException(new RpcException("provider 不存在"));
             ctx.writeAndFlush(JSONObject.toJSONString(response));

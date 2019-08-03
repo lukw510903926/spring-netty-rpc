@@ -1,5 +1,11 @@
 package com.spring.netty.common.constants;
 
+/**
+ * @description: redis 发布订阅频道
+ * @email:lkw510903926@163.com
+ * @author: yangqi 
+ * @since: 2019-08-03 10:28:09
+*/
 public enum ChannelEnum{
 
      /**

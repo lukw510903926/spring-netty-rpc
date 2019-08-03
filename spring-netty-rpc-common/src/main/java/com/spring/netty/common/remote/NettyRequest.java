@@ -18,7 +18,7 @@ public class NettyRequest implements Serializable {
 
     private static final long serialVersionUID = -8878608606655844434L;
 
-    private String requestId;
+    private String id;
 
     private String interfaceName;
 
