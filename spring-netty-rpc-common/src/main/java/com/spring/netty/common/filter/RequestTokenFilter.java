@@ -48,7 +48,6 @@ public class RequestTokenFilter implements Filter {
         JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(param), JSONObject.class);
         token = TokenUtil.genderToken(jsonObject.getInnerMap(), request.getId());
         RpcContext.getContext().put(Constants.TOKEN, token);
-        request.setContext(RpcContext.getContext());
         return object;
     }
 
