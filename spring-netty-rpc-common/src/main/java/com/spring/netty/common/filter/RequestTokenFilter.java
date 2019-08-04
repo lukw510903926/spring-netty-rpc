@@ -1,8 +1,5 @@
 package com.spring.netty.common.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.constants.Constants;
 import com.spring.netty.common.constants.FilterType;
@@ -36,7 +33,7 @@ public class RequestTokenFilter implements Filter {
         String token;
         if (ArrayUtils.isEmpty(args)) {
             token = DigestUtils.md5Hex(request.getId());
-            RpcContext.getContext().put(Constants.TOKEN, token);
+            RpcContext.addParameter(Constants.TOKEN, token);
         }
         if (args.length > 1) {
             throw new RpcException("the max args length is 1");
@@ -47,17 +44,12 @@ public class RequestTokenFilter implements Filter {
         }
         JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(param), JSONObject.class);
         token = TokenUtil.genderToken(jsonObject.getInnerMap(), request.getId());
-        RpcContext.getContext().put(Constants.TOKEN, token);
+        RpcContext.addParameter(Constants.TOKEN, token);
         return object;
     }
 
     @Override
     public String filterType() {
         return FilterType.BEFORE_REQUEST.getType();
-    }
-
-    public static void main(String[] args) {
-        
-        System.out.println(List.class.isAssignableFrom(ArrayList.class));
     }
 }
