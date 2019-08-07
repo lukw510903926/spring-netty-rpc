@@ -26,7 +26,7 @@ public class RequestTokenFilter implements Filter {
     }
 
     @Override
-    public Object doFilter(Object object) {
+    public void doFilter(Object object) {
 
         NettyRequest request = (NettyRequest) object;
         Object[] args = request.getArgs();
@@ -45,7 +45,6 @@ public class RequestTokenFilter implements Filter {
         JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(param), JSONObject.class);
         token = TokenUtil.genderToken(jsonObject.getInnerMap(), request.getId());
         RpcContext.addParameter(Constants.TOKEN, token);
-        return object;
     }
 
     @Override

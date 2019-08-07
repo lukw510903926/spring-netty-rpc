@@ -26,7 +26,8 @@ public class ResponseTokenFilter implements Filter {
     }
 
     @Override
-    public Object doFilter(Object object) {
+    public void doFilter(Object object) {
+        
         NettyRequest request = (NettyRequest) object;
         Object[] args = request.getArgs();
         String requestToken = (String) request.getContext().get(Constants.TOKEN);
@@ -52,7 +53,6 @@ public class ResponseTokenFilter implements Filter {
         if (!requestToken.equals(token)) {
             throw new RpcException(" token validate is fail");
         }
-        return object;
     }
 
     @Override

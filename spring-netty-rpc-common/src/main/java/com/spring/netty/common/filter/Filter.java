@@ -10,7 +10,7 @@ public interface Filter{
 
     int order();
 
-    Object doFilter(Object object);
+    void doFilter(Object object);
 
 
     String filterType();
