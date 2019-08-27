@@ -12,8 +12,8 @@ import javax.annotation.PreDestroy;
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.annotation.Provider;
 import com.spring.netty.common.constants.ChannelEnum;
-import com.spring.netty.common.constants.RegisterEnventType;
-import com.spring.netty.common.domain.RegisterEnvent;
+import com.spring.netty.common.constants.RegisterEventType;
+import com.spring.netty.common.domain.RegisterEvent;
 import com.spring.netty.common.exception.ProviderException;
 import com.spring.netty.common.server.HostInfo;
 import com.spring.netty.common.server.ProviderBean;
@@ -43,7 +43,7 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
 
     private ProviderProperties providerProperties;
 
-    private final String KEY_PREFIX = "reids:provider:";
+    private final String KEY_PREFIX = "redis:provider:";
 
     private ApplicationContext applicationContext;
 
@@ -193,10 +193,10 @@ public class RedisRegister implements Register, ApplicationContextAware, Initial
     public void push(String interfaceName) {
 
       Jedis jedis =jedisPool.getResource();
-      RegisterEnvent registerEnvent = new RegisterEnvent();
-      registerEnvent.setInterfaceName(interfaceName);
-      registerEnvent.setEnvent(RegisterEnventType.REGISTER.getDesc());
-      jedis.publish(ChannelEnum.REGISTER.getChannel(), JSONObject.toJSONString(registerEnvent));
+      RegisterEvent registerEvent = new RegisterEvent();
+      registerEvent.setInterfaceName(interfaceName);
+      registerEvent.setEvent(RegisterEventType.REGISTER.getDesc());
+      jedis.publish(ChannelEnum.REGISTER.getChannel(), JSONObject.toJSONString(registerEvent));
       closeJedis(jedis);
     }
 

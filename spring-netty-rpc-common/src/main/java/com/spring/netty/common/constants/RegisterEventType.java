@@ -6,7 +6,7 @@ package com.spring.netty.common.constants;
  * @author: yangqi 
  * @since: 2019-08-03 10:28:31
 */
-public enum RegisterEnventType{
+public enum RegisterEventType{
     
     /**
      * 注册接口
@@ -21,7 +21,7 @@ public enum RegisterEnventType{
 
     private String desc;
 
-    RegisterEnventType(String desc){
+    RegisterEventType(String desc){
         this.desc = desc;
     }
 

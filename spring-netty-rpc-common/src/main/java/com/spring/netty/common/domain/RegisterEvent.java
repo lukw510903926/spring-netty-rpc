@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class RegisterEnvent implements Serializable {
+public class RegisterEvent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -17,6 +17,6 @@ public class RegisterEnvent implements Serializable {
     /**
      * 时间
      */
-    private String envent;
+    private String event;
 
 }
