@@ -38,10 +38,6 @@
         </dependency>
         <dependency>
             <groupId>com.spring.netty</groupId>
-            <artifactId>spring-netty-rpc-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.spring.netty</groupId>
             <artifactId>spring-netty-rpc-common</artifactId>
         </dependency>
         <dependency>

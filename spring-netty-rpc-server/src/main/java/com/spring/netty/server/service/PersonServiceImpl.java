@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @author yangqi
  * @Description </p>
- * @email yangqi@ywwl.com
+ * @email lkw510903926@163.com
  * @since 2019/1/17 17:12
  **/
 @Service
