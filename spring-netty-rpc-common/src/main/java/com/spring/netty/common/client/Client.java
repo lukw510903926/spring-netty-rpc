@@ -1,9 +1,6 @@
 package com.spring.netty.common.client;
 
 import com.spring.netty.common.remote.NettyRequest;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.EventLoopGroup;
 
 /**
  * <p>
@@ -24,11 +21,9 @@ public interface Client {
     Object request(NettyRequest nettyRequest);
 
     /**
-     * 创建连接
+     * 客户端是否可用
      *
-     * @param group
-     * @param bootstrap
      * @return
      */
-    Channel start(EventLoopGroup group, Bootstrap bootstrap);
+    boolean isActive();
 }

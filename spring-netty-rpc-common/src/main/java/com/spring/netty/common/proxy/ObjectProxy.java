@@ -1,7 +1,7 @@
 package com.spring.netty.common.proxy;
 
 import com.spring.netty.common.remote.NettyRequest;
-import com.spring.netty.common.util.ClientManger;
+import com.spring.netty.common.client.ClientManger;
 import com.spring.netty.common.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +26,7 @@ public class ObjectProxy<T> implements InvocationHandler {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args){
 
         if (Object.class == method.getDeclaringClass()) {
             String name = method.getName();
@@ -49,6 +49,6 @@ public class ObjectProxy<T> implements InvocationHandler {
         request.setArgs(args);
         request.setInterfaceName(clazz.getName());
         log.info("request : {}", request);
-        return ClientManger.getClient().request(request);
+        return ClientManger.getClient(clazz.getCanonicalName()).request(request);
     }
 }

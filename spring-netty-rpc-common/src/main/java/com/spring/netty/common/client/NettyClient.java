@@ -3,7 +3,6 @@ package com.spring.netty.common.client;
 import com.alibaba.fastjson.JSONObject;
 import com.spring.netty.common.remote.DefaultFuture;
 import com.spring.netty.common.remote.NettyRequest;
-import com.spring.netty.common.util.ClientManger;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -12,23 +11,25 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.InetSocketAddress;
 
 @Slf4j
-public class NettyClient implements InitializingBean, Client {
+public class NettyClient implements  Client {
 
-    private String host;
+    private Channel channel;
 
     private int port;
 
-    private Channel channel;
+    private String host;
+
+    private static final int LOCAL_PORT = 8765;
 
     private static final String LOCAL_HOST = "127.0.0.1";
 
     public NettyClient() {
-        this(LOCAL_HOST, 80);
+        this(LOCAL_HOST, LOCAL_PORT);
     }
 
     public NettyClient(int port) {
@@ -36,12 +37,18 @@ public class NettyClient implements InitializingBean, Client {
     }
 
     public NettyClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+        this.host = StringUtils.isBlank(host) ? LOCAL_HOST : host;
+        this.port = port == 0 ? LOCAL_PORT : port;
+        create();
     }
 
     @Override
-    public Channel start(EventLoopGroup group, Bootstrap bootstrap) {
+    public boolean isActive() {
+
+        return this.channel.isActive();
+    }
+
+    private Channel start(EventLoopGroup group, Bootstrap bootstrap) {
 
         try {
             bootstrap.group(group) // 注册线程池
@@ -65,17 +72,14 @@ public class NettyClient implements InitializingBean, Client {
     public Object request(NettyRequest nettyRequest) {
 
         this.channel.writeAndFlush(JSONObject.toJSONString(nettyRequest));
-        DefaultFuture future = new DefaultFuture(nettyRequest,10*1000);
+        DefaultFuture future = new DefaultFuture(nettyRequest, 10 * 1000);
         return future.get().getData();
     }
 
-    @Override
-    public void afterPropertiesSet() {
+    private void create() {
 
-        NettyClient client = new NettyClient(LOCAL_HOST, 8888);
         EventLoopGroup group = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
-        channel = client.start(group, bootstrap);
-        ClientManger.addClient(this);
+        channel = this.start(group, bootstrap);
     }
 }

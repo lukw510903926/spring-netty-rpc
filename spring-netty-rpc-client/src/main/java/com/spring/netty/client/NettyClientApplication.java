@@ -1,26 +1,25 @@
 package com.spring.netty.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
  *
  * @author yangqi
- * @Description </p>
+ * @Description
+ *              </p>
  * @email yangqi@ywwl.com
  * @since 2019/1/17 17:29
  **/
+@Slf4j
 @SpringBootApplication
 public class NettyClientApplication {
-
-    private static Logger logger = LoggerFactory.getLogger(NettyClientApplication.class);
 
     public static void main(String[] args) {
 
         SpringApplication.run(NettyClientApplication.class, args);
-        logger.info("netty client application start successfully");
+        log.info("netty client application startTimeMillis successfully");
     }
 }

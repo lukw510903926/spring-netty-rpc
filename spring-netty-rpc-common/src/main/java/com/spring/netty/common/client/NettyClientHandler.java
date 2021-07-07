@@ -7,8 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
@@ -37,7 +36,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
 
         ByteBuf buf = msg.readBytes(msg.readableBytes());
-        String value = buf.toString(Charset.forName("utf-8"));
+        String value = buf.toString(StandardCharsets.UTF_8);
         NettyResponse response = JSONObject.parseObject(value, NettyResponse.class);
         DefaultFuture.accept(response);
         log.info("客户端接收到的服务端信息:{}", value);
